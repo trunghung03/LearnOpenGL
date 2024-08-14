@@ -1,4 +1,5 @@
 ﻿#include <iostream>
+#include <array>
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -19,25 +20,23 @@ int main() {
 
 	unsigned int shaderProgram = createShader();
 
-	// init vertex attribute object
-	unsigned int VAO;
-	glGenVertexArrays(1, &VAO);
-	glBindVertexArray(VAO);
+	// init vertex objects
+	std::array<unsigned int, 1> VAO{};
+	glGenVertexArrays((GLsizei)VAO.size(), VAO.data());
+	std::array<unsigned int, 1> VBO{};
+	glGenBuffers((GLsizei)VBO.size(), VBO.data());
+	// triangle 1
+	glBindVertexArray(VAO.at(0));
 
 	// Create and send vertex data for rectangle
-	float vertices[] = {
-		-0.25f, 0.5f, 0.0f,	// top 1
-		-0.5f, -0.5f, 0.0f,	// left 1
-		0.0f, -0.5f, 0.0f,	// right 1
-		0.25f, 0.5f, 0.0f,	// top 2
-		0.0f, -0.5f, 0.0f,	// left 2
-		0.5f, -0.5f, 0.0f	// right 2
+	float tri1[] = {
+		0.0f, 0.5f, 0.0f,	// top
+		-0.5f, -0.5f, 0.0f,	// left
+		0.5f, -0.5f, 0.0f	// right
 	};
 	// init vertex buffer object
-	unsigned int VBO{};
-	glGenBuffers(1, &VBO);
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, VBO.at(0));
+	glBufferData(GL_ARRAY_BUFFER, sizeof(tri1), tri1, GL_STATIC_DRAW);
 
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
@@ -53,8 +52,8 @@ int main() {
 		glClear(GL_COLOR_BUFFER_BIT);
 		
 		glUseProgram(shaderProgram);
-		glBindVertexArray(VAO);
-		glDrawArrays(GL_TRIANGLES, 0, 6);
+		glBindVertexArray(VAO[0]);
+		glDrawArrays(GL_TRIANGLES, 0, 3);
 		//glDrawArrays(GL_TRIANGLES, 3, 5);
 
 		// swap buffer and call events
