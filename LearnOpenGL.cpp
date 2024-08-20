@@ -8,6 +8,7 @@
 #include "stb_image.h"
 
 GLFWwindow* window{};
+float mixValue = 0.2f;
 
 bool init();
 void frame_buffer_size_callback(GLFWwindow* window, int width, int height);
@@ -106,6 +107,7 @@ int main() {
 	ourShader.use();
 	ourShader.setInt("texture1", 0);
 	ourShader.setInt("texture2", 1);
+	
 	while (!glfwWindowShouldClose(window)) {
 		// input
 		processInput(window);
@@ -113,6 +115,8 @@ int main() {
 		// render
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
+
+		ourShader.setFloat("mixValue", mixValue);
 
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, texture);
@@ -167,9 +171,15 @@ void frame_buffer_size_callback(GLFWwindow* window, int width, int height) {
 int processInput(GLFWwindow* window) {
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
 		glfwSetWindowShouldClose(window, true);
-		return 0;
 	}
 	if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_1) == GLFW_PRESS) {
 		return 1;
 	}
+	if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS && mixValue <= 1.0f) {
+		mixValue += 0.0001f;
+	}
+	if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS && mixValue >= 0.0f) {
+		mixValue -= 0.0001f;
+	}
+	return 0;
 }
