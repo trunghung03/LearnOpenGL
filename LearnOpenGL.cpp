@@ -14,12 +14,7 @@
 
 GLFWwindow* window{};
 // Camera
-glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
-glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
-glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
-
-float yaw = -90.0f;
-float pitch = 0.0f;
+Camera camera{};
 
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
@@ -187,7 +182,7 @@ int main() {
 
 		// Camera
 		glm::mat4 view;
-		view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
+		view = glm::lookAt(camera.pos, camera.pos + camera.front, camera.up);
 
 		// render
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
@@ -275,13 +270,13 @@ int processInput(GLFWwindow* window) {
 	}
 	const float cameraSpeed = 2.5f * deltaTime;
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-		cameraPos += cameraSpeed * cameraFront;
+		camera.pos += cameraSpeed * camera.front;
 	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-		cameraPos -= cameraSpeed * cameraFront;
+		camera.pos -= cameraSpeed * camera.front;
 	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-		cameraPos -= glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+		camera.pos -= glm::normalize(glm::cross(camera.front, camera.up)) * cameraSpeed;
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-		cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+		camera.pos += glm::normalize(glm::cross(camera.front, camera.up)) * cameraSpeed;
 	return 0;
 }
 
@@ -297,21 +292,20 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos) {
 	lastX = (float) xpos;
 	lastY = (float) ypos;
 
-	const float sensitivity = 0.1f;
-	xoffset *= sensitivity;
-	yoffset *= sensitivity;
+	xoffset *= camera.sensitivity;
+	yoffset *= camera.sensitivity;
 
-	yaw += xoffset;
-	pitch += yoffset;
+	camera.yaw += xoffset;
+	camera.pitch += yoffset;
 
-	if (pitch > 89.0f)
-		pitch = 89.0f;
-	if (pitch < -89.0f)
-		pitch = -89.0f;
+	if (camera.pitch > 89.0f)
+		camera.pitch = 89.0f;
+	if (camera.pitch < -89.0f)
+		camera.pitch = -89.0f;
 	
 	glm::vec3 direction{};
-	direction.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
-	direction.y = sin(glm::radians(pitch));
-	direction.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
-	cameraFront = glm::normalize(direction);
+	direction.x = cos(glm::radians(camera.yaw)) * cos(glm::radians(camera.pitch));
+	direction.y = sin(glm::radians(camera.pitch));
+	direction.z = sin(glm::radians(camera.yaw)) * cos(glm::radians(camera.pitch));
+	camera.front = glm::normalize(direction);
 }
