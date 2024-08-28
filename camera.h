@@ -14,7 +14,6 @@ public:
 	glm::vec3 Up;
 	glm::vec3 Right;
 	glm::vec3 WorldUp;
-	glm::vec3 WorldRight;
 
 	float Yaw;
 	float Pitch;
@@ -34,7 +33,7 @@ public:
 		Pitch = 0.0f;
 
 		Zoom = 45.0f;
-		MovementSpeed = 2.5f;
+		MovementSpeed = 10.0f;
 		Sensitivity = 0.1f;
 
 		updateCameraVector();
@@ -89,6 +88,7 @@ public:
 			Position += glm::normalize(glm::cross(Front, Up)) * MovementSpeed * deltaTime;
 			break;
 		}
+		Position.y = 0;
 	}
 
 	void processMouse(float xoffset, float yoffset, bool pitchConstraint) {
