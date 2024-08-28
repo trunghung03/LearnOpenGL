@@ -178,6 +178,7 @@ int main() {
 		float currentFrame = (float)glfwGetTime();
 		deltaTime = currentFrame - lastFrame;
 		lastFrame = currentFrame;
+		ourShader.setFloat("time", (float) glfwGetTime());
 
 		// input
 		processInput(window);
