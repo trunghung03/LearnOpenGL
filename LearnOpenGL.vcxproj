@@ -71,11 +71,11 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>C:\Users\synapse\Documents\src\LearnOpenGL\glm;C:\vclib\glad\include;C:\vclib\glfw-3.4\include;$(IncludePath)</IncludePath>
+    <IncludePath>C:\Users\synapse\Documents\LearnOpenGL\glm;C:\vclib\glad\include;C:\vclib\glfw-3.4\include;$(IncludePath)</IncludePath>
     <LibraryPath>C:\vclib\glfw-3.4\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>C:\Users\synapse\Documents\src\LearnOpenGL\glm;C:\vclib\glad\include;C:\vclib\glfw-3.4\include;$(IncludePath)</IncludePath>
+    <IncludePath>C:\Users\synapse\Documents\LearnOpenGL\glm;C:\vclib\glad\include;C:\vclib\glfw-3.4\include;$(IncludePath)</IncludePath>
     <LibraryPath>C:\vclib\glfw-3.4\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -147,6 +147,8 @@
     <ClInclude Include="stb_image.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="lightsource.frag" />
+    <None Include="lightsource.vert" />
     <None Include="shader.frag">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>

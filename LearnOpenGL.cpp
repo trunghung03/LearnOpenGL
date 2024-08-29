@@ -40,7 +40,8 @@ int main() {
 	glfwSetScrollCallback(window, scroll_callback);
 	glEnable(GL_DEPTH_TEST);
 	// Shader program
-	Shader ourShader("shader.vert", "shader.frag");
+	Shader lightingShader("shader.vert", "shader.frag");
+	Shader lightSourceShader("lightsource.vert", "lightsource.frag");
 
 	// World info
 	std::array<unsigned int, 1> VAO{}, VBO{}, EBO{};
@@ -126,6 +127,12 @@ int main() {
 		glm::vec3(-1.3f,  1.0f, -1.5f)
 	};
 
+	unsigned int lightVAO;
+	glGenVertexArrays(1, &lightVAO);
+	glBindVertexArray(lightVAO);
+	glBindBuffer(GL_ARRAY_BUFFER, VBO.at(0));
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
+
 	// Texture 
 	unsigned int texture;
 	glGenTextures(1, &texture);
@@ -169,16 +176,22 @@ int main() {
 		std::cout << "Failed to load texture" << std::endl;
 	}
 
-	ourShader.use();
-	ourShader.setInt("texture1", 0);
-	ourShader.setInt("texture2", 1);
+	
+
+	// light source cube position
+	glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
+	glm::mat4 lightSourceModel = glm::mat4(1.0f);
+	lightSourceModel = glm::translate(lightSourceModel, lightPos);
+	lightSourceModel = glm::scale(lightSourceModel, glm::vec3(0.2f));
+
+	
 
 	while (!glfwWindowShouldClose(window)) {
 		// delta time calculation
 		float currentFrame = (float)glfwGetTime();
 		deltaTime = currentFrame - lastFrame;
 		lastFrame = currentFrame;
-		ourShader.setFloat("time", (float) glfwGetTime());
+		lightingShader.setFloat("time", (float) glfwGetTime());
 
 		// input
 		processInput(window);
@@ -188,7 +201,15 @@ int main() {
 		view = glm::lookAt(camera.Position, camera.Position + camera.Front, camera.Up);
 
 		// render
-		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+		lightingShader.use();
+		lightingShader.setInt("texture1", 0);
+		lightingShader.setInt("texture2", 1);
+
+		lightingShader.setInt("screenWidth", 800);
+		lightingShader.setVec3("objectColor", 1.0f, 0.5f, 0.31f);
+		lightingShader.setVec3("lightColor", 1.0f, 1.0f, 1.0f);
+
+		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		glm::mat4 projection;
@@ -196,8 +217,8 @@ int main() {
 		glfwGetWindowSize(window, &width, &height);
 		projection = glm::perspective(glm::radians(camera.Zoom), (float)width / height, 0.1f, 100.0f);
 
-		ourShader.setMat4("view", view);
-		ourShader.setMat4("projection", projection);
+		lightingShader.setMat4("view", view);
+		lightingShader.setMat4("projection", projection);
 
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, texture);
@@ -205,17 +226,23 @@ int main() {
 		glBindTexture(GL_TEXTURE_2D, texture2);
 		glBindVertexArray(VAO[0]);
 
-		for (unsigned int i = 0; i < 10; i++)
+		for (unsigned int i = 0; i < 1; i++)
 		{
 			glm::mat4 model = glm::mat4(1.0f);
 			model = glm::translate(model, cubePositions[i]);
-			float angle = (float)fmod(glfwGetTime() * (i + 1) * 10, 360);
-			//float angle = sin(glfwGetTime()*10 *i) * 20 + 30 *i;
+			//float angle = (float)fmod(glfwGetTime() * (i + 1) * 10, 360);
+			float angle = 0.0f;
 			model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
-			ourShader.setMat4("model", model);
+			lightingShader.setMat4("model", model);
 
 			glDrawArrays(GL_TRIANGLES, 0, 36);
 		}
+
+		lightSourceShader.use();
+		lightSourceShader.setMat4("view", view);
+		lightSourceShader.setMat4("projection", projection);
+		lightSourceShader.setMat4("model", lightSourceModel);
+		glDrawArrays(GL_TRIANGLES, 0, 36);
 
 		// swap buffer and call events
 		glfwPollEvents();

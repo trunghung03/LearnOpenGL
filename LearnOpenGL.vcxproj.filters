@@ -39,6 +39,8 @@
   <ItemGroup>
     <None Include="shader.vert" />
     <None Include="shader.frag" />
+    <None Include="lightsource.frag" />
+    <None Include="lightsource.vert" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="container.jpg">
