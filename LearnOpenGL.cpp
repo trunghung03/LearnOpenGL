@@ -177,9 +177,6 @@ int main() {
 		std::cout << "Failed to load texture" << std::endl;
 	}
 
-	
-
-
 	while (!glfwWindowShouldClose(window)) {
 		// delta time calculation
 		float currentFrame = (float)glfwGetTime();
@@ -202,9 +199,9 @@ int main() {
 		lightSourceModelMatrix = glm::translate(lightSourceModelMatrix, lightPos);
 		lightSourceModelMatrix = glm::scale(lightSourceModelMatrix, glm::vec3(0.2f));
 
-		lightSourceShader.setVec3("lightPos", lightPos);
 
 		lightingShader.use();
+		lightingShader.setVec3("lightPos", lightPos);
 		lightingShader.setInt("texture1", 0);
 		lightingShader.setInt("texture2", 1);
 
