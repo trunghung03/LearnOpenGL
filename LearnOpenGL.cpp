@@ -99,6 +99,9 @@ int main() {
 		0, 1, 3, // first triangle
 		1, 2, 3  // second triangle
 	};
+
+	glm::vec3 cubePosition = glm::vec3(0.0f);
+	
 	// init vertex buffer object
 	glBindBuffer(GL_ARRAY_BUFFER, VBO.at(0));
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
@@ -114,19 +117,6 @@ int main() {
 
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
-	glm::vec3 cubePositions[] = {
-		glm::vec3(0.0f,  0.0f,  0.0f),
-		glm::vec3(2.0f,  5.0f, -15.0f),
-		glm::vec3(-1.5f, -2.2f, -2.5f),
-		glm::vec3(-3.8f, -2.0f, -12.3f),
-		glm::vec3(2.4f, -0.4f, -3.5f),
-		glm::vec3(-1.7f,  3.0f, -7.5f),
-		glm::vec3(1.3f, -2.0f, -2.5f),
-		glm::vec3(1.5f,  2.0f, -2.5f),
-		glm::vec3(1.5f,  0.2f, -1.5f),
-		glm::vec3(-1.3f,  1.0f, -1.5f)
-	};
-
 	unsigned int lightVAO;
 	glGenVertexArrays(1, &lightVAO);
 	glBindVertexArray(lightVAO);
@@ -134,81 +124,26 @@ int main() {
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
 
-	// Texture 
-	unsigned int texture;
-	glGenTextures(1, &texture);
-	glBindTexture(GL_TEXTURE_2D, texture);
+	// light source cube position
+	glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
+	glm::mat4 lightSourceModelMatrix = glm::mat4(1.0f);
+	lightSourceModelMatrix = glm::translate(lightSourceModelMatrix, lightPos);
+	lightSourceModelMatrix = glm::scale(lightSourceModelMatrix, glm::vec3(0.2f));
 
-	// set the texture wrapping/filtering options (on the currently bound texture object)
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-
-	int width, height, nrChannels;
-	unsigned char* data = stbi_load("container.jpg", &width, &height, &nrChannels, 0);
-	if (data) {
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
-		glGenerateMipmap(GL_TEXTURE_2D);
-		stbi_image_free(data);
-	}
-	else {
-		std::cout << "Failed to load texture" << std::endl;
-	}
-
-	unsigned int texture2;
-	glGenTextures(1, &texture2);
-	glBindTexture(GL_TEXTURE_2D, texture2);
-
-	// set the texture wrapping/filtering options (on the currently bound texture object)
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-
-	stbi_set_flip_vertically_on_load(true);
-	data = stbi_load("awesomeface.png", &width, &height, &nrChannels, 0);
-	if (data) {
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-		glGenerateMipmap(GL_TEXTURE_2D);
-		stbi_image_free(data);
-	}
-	else {
-		std::cout << "Failed to load texture" << std::endl;
-	}
-
-	
-
+	lightSourceShader.setVec3("lightPos", lightPos);
 
 	while (!glfwWindowShouldClose(window)) {
 		// delta time calculation
 		float currentFrame = (float)glfwGetTime();
 		deltaTime = currentFrame - lastFrame;
 		lastFrame = currentFrame;
-		lightingShader.setFloat("time", (float) glfwGetTime());
 
 		// input
 		processInput(window);
 
-		// Camera
-		glm::mat4 view;
-		view = glm::lookAt(camera.Position, camera.Position + camera.Front, camera.Up);
-
 		// render
-
-		// light source cube position
-		glm::vec3 lightPos(1.2f, 1.0f, sin(glfwGetTime()));
-		glm::mat4 lightSourceModelMatrix = glm::mat4(1.0f);
-		lightSourceModelMatrix = glm::translate(lightSourceModelMatrix, lightPos);
-		lightSourceModelMatrix = glm::scale(lightSourceModelMatrix, glm::vec3(0.2f));
-
-		lightSourceShader.setVec3("lightPos", lightPos);
-
 		lightingShader.use();
-		lightingShader.setInt("texture1", 0);
-		lightingShader.setInt("texture2", 1);
 
-		lightingShader.setInt("screenWidth", 800);
 		lightingShader.setVec3("objectColor", glm::vec3(1.0f, 0.5f, 0.31f));
 		lightingShader.setVec3("lightColor", glm::vec3(1.0f, 1.0f, 1.0f));
 
@@ -216,30 +151,18 @@ int main() {
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		glm::mat4 projection;
-		int width, height;
-		glfwGetWindowSize(window, &width, &height);
-		projection = glm::perspective(glm::radians(camera.Zoom), (float)width / height, 0.1f, 100.0f);
+		projection = glm::perspective(glm::radians(camera.Zoom), 800.0f / 600.0f, 0.1f, 100.0f);
 
+		glm::mat4 model = glm::translate(glm::mat4(1.0f), cubePosition);
+		float angle = 0.0f;
+		model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
+
+		glm::mat4 view = camera.getViewMatrix();
+		lightingShader.setMat4("model", model);
 		lightingShader.setMat4("view", view);
 		lightingShader.setMat4("projection", projection);
 
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, texture);
-		glActiveTexture(GL_TEXTURE1);
-		glBindTexture(GL_TEXTURE_2D, texture2);
-		glBindVertexArray(VAO[0]);
-
-		for (unsigned int i = 0; i < 1; i++)
-		{
-			glm::mat4 model = glm::mat4(1.0f);
-			model = glm::translate(model, cubePositions[i]);
-			//float angle = (float)fmod(glfwGetTime() * (i + 1) * 10, 360);
-			float angle = 0.0f;
-			model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
-			lightingShader.setMat4("model", model);
-
-			glDrawArrays(GL_TRIANGLES, 0, 36);
-		}
+		glDrawArrays(GL_TRIANGLES, 0, 36);
 
 		lightSourceShader.use();
 		lightSourceShader.setMat4("view", view);
