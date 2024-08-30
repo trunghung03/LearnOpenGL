@@ -4,7 +4,9 @@ enum Camera_Movement {
 	FORWARD,
 	BACKWARD,
 	LEFT,
-	RIGHT
+	RIGHT,
+	UP, 
+	DOWN
 };
 
 class Camera {
@@ -74,21 +76,27 @@ public:
 	}
 
 	void processKeyboard(Camera_Movement movement, float deltaTime) {
+		glm::vec3 planeFront = glm::normalize(glm::vec3(Front.x, 0, Front.z));
 		switch (movement) {
 		case (FORWARD):
-			Position += MovementSpeed * Front * deltaTime;
+			Position += MovementSpeed * planeFront * deltaTime;
 			break;
 		case (BACKWARD):
-			Position -= MovementSpeed * Front * deltaTime;
+			Position -= MovementSpeed * planeFront * deltaTime;
 			break;
 		case (LEFT):
-			Position -= glm::normalize(glm::cross(Front, Up)) * MovementSpeed * deltaTime;
+			Position -= glm::normalize(glm::cross(planeFront, Up)) * MovementSpeed * deltaTime;
 			break;
 		case (RIGHT):
-			Position += glm::normalize(glm::cross(Front, Up)) * MovementSpeed * deltaTime;
+			Position += glm::normalize(glm::cross(planeFront, Up)) * MovementSpeed * deltaTime;
+			break;
+		case (UP) :
+			Position += WorldUp * MovementSpeed * deltaTime;
+			break;
+		case (DOWN):
+			Position -= WorldUp * MovementSpeed * deltaTime;
 			break;
 		}
-		Position.y = 0;
 	}
 
 	void processMouse(float xoffset, float yoffset, bool pitchConstraint) {
