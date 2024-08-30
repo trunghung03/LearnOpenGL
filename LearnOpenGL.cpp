@@ -194,7 +194,7 @@ int main() {
 		// render
 
 		// light source cube position
-		glm::vec3 lightPos(1.2f, 1.0f, sin(glfwGetTime()));
+		glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
 		glm::mat4 lightSourceModelMatrix = glm::mat4(1.0f);
 		lightSourceModelMatrix = glm::translate(lightSourceModelMatrix, lightPos);
 		lightSourceModelMatrix = glm::scale(lightSourceModelMatrix, glm::vec3(0.2f));
@@ -202,6 +202,8 @@ int main() {
 
 		lightingShader.use();
 		lightingShader.setVec3("lightPos", lightPos);
+		lightingShader.setVec3("viewPos", camera.Position);
+
 		lightingShader.setInt("texture1", 0);
 		lightingShader.setInt("texture2", 1);
 
