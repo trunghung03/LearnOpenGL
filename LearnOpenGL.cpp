@@ -180,6 +180,27 @@ int main() {
 		std::cout << "Failed to load texture" << std::endl;
 	}
 
+	unsigned int emissionMap;
+	glGenTextures(1, &emissionMap);
+	glBindTexture(GL_TEXTURE_2D, emissionMap);
+
+	// set the texture wrapping/filtering options (on the currently bound texture object)
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+	stbi_set_flip_vertically_on_load(true);
+	data = stbi_load("matrix.jpg", &width, &height, &nrChannels, 0);
+	if (data) {
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+		glGenerateMipmap(GL_TEXTURE_2D);
+		stbi_image_free(data);
+	}
+	else {
+		std::cout << "Failed to load texture" << std::endl;
+	}
+
 	while (!glfwWindowShouldClose(window)) {
 		// delta time calculation
 		float currentFrame = (float)glfwGetTime();
@@ -209,6 +230,7 @@ int main() {
 
 		lightingShader.setInt("material.diffuse", 0);
 		lightingShader.setInt("material.specular", 1);
+		lightingShader.setInt("material.emission", 2);
 
 		lightingShader.setInt("screenWidth", 800);
 
@@ -234,6 +256,8 @@ int main() {
 		glBindTexture(GL_TEXTURE_2D, diffuseMap);
 		glActiveTexture(GL_TEXTURE1);
 		glBindTexture(GL_TEXTURE_2D, specularMap);
+		glActiveTexture(GL_TEXTURE2);
+		glBindTexture(GL_TEXTURE_2D, emissionMap);
 		glBindVertexArray(VAO[0]);
 
 		for (unsigned int i = 0; i < 1; i++)
