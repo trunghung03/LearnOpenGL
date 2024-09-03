@@ -225,12 +225,13 @@ int main() {
 
 
 		lightingShader.use();
-		lightingShader.setVec3("light.position", lightPos);
+		//lightingShader.setVec3("light.position", lightPos);
+		lightingShader.setVec3("light.direction", glm::vec3(-0.2f, -1.0f, -0.3f));
 		lightingShader.setVec3("viewPos", camera.Position);
 
 		lightingShader.setInt("material.diffuse", 0);
 		lightingShader.setInt("material.specular", 1);
-		lightingShader.setInt("material.emission", 2);
+		//lightingShader.setInt("material.emission", 2);
 
 		lightingShader.setInt("screenWidth", 800);
 
@@ -256,8 +257,8 @@ int main() {
 		glBindTexture(GL_TEXTURE_2D, diffuseMap);
 		glActiveTexture(GL_TEXTURE1);
 		glBindTexture(GL_TEXTURE_2D, specularMap);
-		glActiveTexture(GL_TEXTURE2);
-		glBindTexture(GL_TEXTURE_2D, emissionMap);
+		//glActiveTexture(GL_TEXTURE2);
+		//glBindTexture(GL_TEXTURE_2D, emissionMap);
 		glBindVertexArray(VAO[0]);
 
 		for (unsigned int i = 0; i < 10; i++)
@@ -265,7 +266,7 @@ int main() {
 			glm::mat4 model = glm::mat4(1.0f);
 			model = glm::translate(model, cubePositions[i]);
 			//float angle = (float)fmod(glfwGetTime() * (i + 1) * 10, 360);
-			float angle = 0.0f;
+			float angle = 20.0f * i;
 			model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
 			lightingShader.setMat4("model", model);
 
