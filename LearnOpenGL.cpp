@@ -225,8 +225,7 @@ int main() {
 
 
 		lightingShader.use();
-		//lightingShader.setVec3("light.position", lightPos);
-		lightingShader.setVec3("light.direction", glm::vec3(-0.2f, -1.0f, -0.3f));
+		lightingShader.setVec3("light.position", lightPos);
 		lightingShader.setVec3("viewPos", camera.Position);
 
 		lightingShader.setInt("material.diffuse", 0);
@@ -238,9 +237,18 @@ int main() {
 		lightingShader.setFloat("material.shininess", 64.0f);
 
 		// light properties
+		lightingShader.setVec3("light.position", camera.Position);
+		lightingShader.setVec3("light.direction", camera.Front);
+		lightingShader.setFloat("light.cutOff", glm::cos(glm::radians(12.5f)));
+		lightingShader.setFloat("light.outerCutOff", glm::cos(glm::radians(17.5f)));
+
 		lightingShader.setVec3("light.ambient", glm::vec3(0.2f, 0.2f, 0.2f));
 		lightingShader.setVec3("light.diffuse", glm::vec3(0.5f, 0.5f, 0.5f));
 		lightingShader.setVec3("light.specular", glm::vec3(1.0f, 1.0f, 1.0f));
+
+		lightingShader.setFloat("light.constant", 1.0f);
+		lightingShader.setFloat("light.linear", 0.045f);
+		lightingShader.setFloat("light.quadratic", 0.0075f);
 
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
