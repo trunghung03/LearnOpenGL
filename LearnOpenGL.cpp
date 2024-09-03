@@ -225,7 +225,7 @@ int main() {
 
 
 		lightingShader.use();
-		lightingShader.setVec3("lightPos", lightPos);
+		lightingShader.setVec3("light.position", lightPos);
 		lightingShader.setVec3("viewPos", camera.Position);
 
 		lightingShader.setInt("material.diffuse", 0);
@@ -260,7 +260,7 @@ int main() {
 		glBindTexture(GL_TEXTURE_2D, emissionMap);
 		glBindVertexArray(VAO[0]);
 
-		for (unsigned int i = 0; i < 1; i++)
+		for (unsigned int i = 0; i < 10; i++)
 		{
 			glm::mat4 model = glm::mat4(1.0f);
 			model = glm::translate(model, cubePositions[i]);
