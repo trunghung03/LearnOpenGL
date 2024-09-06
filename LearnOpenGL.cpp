@@ -1,6 +1,7 @@
 ﻿#include <iostream>
 #include <array>
 #include <math.h>
+#include <filesystem>
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -11,6 +12,7 @@
 #include "shader.h"
 #include "camera.h"
 #include "stb_image.h"
+#include "model.h"
 
 GLFWwindow* window{};
 // Camera
@@ -23,7 +25,6 @@ float lastX = 400, lastY = 300;
 bool firstMouse = true;
 
 bool init();
-unsigned int load_texture(const char * filePath);
 void frame_buffer_size_callback(GLFWwindow* window, int width, int height);
 int processInput(GLFWwindow* window);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
@@ -109,13 +110,6 @@ int main() {
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO.at(0));
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
-	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
-	glEnableVertexAttribArray(2);
-
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
 	glm::vec3 cubePositions[] = {
@@ -145,9 +139,8 @@ int main() {
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
 
-	
-	unsigned int diffuseMap = load_texture("container2.png");
-	unsigned int specularMap = load_texture("container2_specular.png");
+
+	Model backpack = Model("model/backpack/backpack.obj");
 
 	while (!glfwWindowShouldClose(window)) {
 		// delta time calculation
@@ -171,8 +164,10 @@ int main() {
 		lightSourceModelMatrix = glm::translate(lightSourceModelMatrix, lightPos);
 		lightSourceModelMatrix = glm::scale(lightSourceModelMatrix, glm::vec3(0.2f));
 
-
 		lightingShader.use();
+		backpack.Draw(lightingShader);
+
+
 		lightingShader.setVec3("light.position", lightPos);
 		lightingShader.setVec3("viewPos", camera.Position);
 
@@ -240,7 +235,7 @@ int main() {
 		lightingShader.setFloat("spotLight.cutOff", glm::cos(glm::radians(12.5f)));
 		lightingShader.setFloat("spotLight.outerCutOff", glm::cos(glm::radians(15.0f)));
 
-		glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+		glClearColor(.0f, .0f, .0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		glm::mat4 projection;
@@ -251,10 +246,6 @@ int main() {
 		lightingShader.setMat4("view", view);
 		lightingShader.setMat4("projection", projection);
 
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, diffuseMap);
-		glActiveTexture(GL_TEXTURE1);
-		glBindTexture(GL_TEXTURE_2D, specularMap);
 		//glActiveTexture(GL_TEXTURE2);
 		//glBindTexture(GL_TEXTURE_2D, emissionMap);
 		glBindVertexArray(VAO[0]);
@@ -296,46 +287,6 @@ int main() {
 	glfwTerminate();
 
 	return 0;
-}
-
-unsigned int load_texture(const char * filePath) {
-	int width, height, nrChannels;
-	unsigned int textureID;
-	glGenTextures(1, &textureID);
-	glBindTexture(GL_TEXTURE_2D, textureID);
-
-	// set the texture wrapping/filtering options (on the currently bound texture object)
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-
-	//stbi_set_flip_vertically_on_load(true);
-	unsigned char* data = stbi_load(filePath, &width, &height, &nrChannels, 0);
-	if (data) {
-		GLenum format;
-		switch (nrChannels) {
-		case 1:
-			format = GL_RED;
-			break;
-		case 3:
-			format = GL_RGB;
-			break;
-		case 4:
-			format = GL_RGBA;
-			break;
-		}
-
-		glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
-		glGenerateMipmap(GL_TEXTURE_2D);
-		stbi_image_free(data);
-	}
-	else {
-		std::cout << "Failed to load texture" << std::endl;
-		stbi_image_free(data);
-	}
-
-	return textureID;
 }
 
 bool init() {
