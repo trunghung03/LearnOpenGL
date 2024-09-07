@@ -140,11 +140,12 @@ int main() {
 	glEnableVertexAttribArray(0);
 
 
-	Model backpack = Model("model/backpack/backpack.obj");
+	//Model backpack = Model("model/backpack/backpack.obj");
+	Model backpack = Model("model/anime/anime.gltf");
 
 	while (!glfwWindowShouldClose(window)) {
 		// delta time calculation
-		float currentFrame = (float)glfwGetTime();
+		float currentFrame = (float)glfwGetTime(); 
 		deltaTime = currentFrame - lastFrame;
 		lastFrame = currentFrame;
 		lightingShader.setFloat("time", (float) glfwGetTime());
@@ -188,7 +189,7 @@ int main() {
 		*/
 		// directional light
 		lightingShader.setVec3("dirLight.direction", -0.2f, -1.0f, -0.3f);
-		lightingShader.setVec3("dirLight.ambient", 0.2f, 0.2f, 0.2f);
+		lightingShader.setVec3("dirLight.ambient", .05f, .05f, .05f);
 		lightingShader.setVec3("dirLight.diffuse", 0.4f, 0.4f, 0.4f);
 		lightingShader.setVec3("dirLight.specular", 0.5f, 0.5f, 0.5f);
 		// point light 1
@@ -235,7 +236,8 @@ int main() {
 		lightingShader.setFloat("spotLight.cutOff", glm::cos(glm::radians(12.5f)));
 		lightingShader.setFloat("spotLight.outerCutOff", glm::cos(glm::radians(15.0f)));
 
-		glClearColor(.0f, .0f, .0f, 1.0f);
+		//glClearColor(.0f, .0f, .0f, 1.0f);
+		glClearColor(.3f, .4f, .6f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		glm::mat4 projection;
@@ -263,7 +265,7 @@ int main() {
 			model = glm::translate(model, pointLightPositions[i]);
 			lightSourceShader.setMat4("model", model);
 
-			glDrawArrays(GL_TRIANGLES, 0, 36);
+			//glDrawArrays(GL_TRIANGLES, 0, 36);
 		}
 
 		// swap buffer and call events
