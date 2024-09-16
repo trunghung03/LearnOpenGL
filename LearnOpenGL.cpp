@@ -143,6 +143,8 @@ int main() {
 	//Model backpack = Model("model/backpack/backpack.obj");
 	Model backpack = Model("model/anime/anime.gltf");
 
+	//glDepthFunc(GL_GREATER);
+
 	while (!glfwWindowShouldClose(window)) {
 		// delta time calculation
 		float currentFrame = (float)glfwGetTime(); 
@@ -265,7 +267,7 @@ int main() {
 			model = glm::translate(model, pointLightPositions[i]);
 			lightSourceShader.setMat4("model", model);
 
-			//glDrawArrays(GL_TRIANGLES, 0, 36);
+			glDrawArrays(GL_TRIANGLES, 0, 36);
 		}
 
 		// swap buffer and call events

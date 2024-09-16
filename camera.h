@@ -25,7 +25,7 @@ public:
 	float Sensitivity;
 
 	Camera() {
-		Position = glm::vec3(0.0f, 0.0f, 3.0f);
+		Position = glm::vec3(0.0f, 1.f, 3.0f);
 		Front = glm::vec3(0.0f, 0.0f, -1.0f);
 		Up = glm::vec3(0.0f, 1.0f, 0.0f);
 		Right = glm::normalize(glm::cross(Front, Up));
