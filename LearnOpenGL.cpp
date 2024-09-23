@@ -32,7 +32,7 @@ void frame_buffer_size_callback(GLFWwindow* window, int width, int height);
 int processInput(GLFWwindow* window);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
-unsigned int loadTexture(const char* filePath);
+unsigned int loadTexture(const char* filePath, bool isClamped);
 
 int main() {
 	if (!init()) {
@@ -45,6 +45,7 @@ int main() {
 	glfwSetCursorPosCallback(window, mouse_callback);
 	glfwSetScrollCallback(window, scroll_callback);
 	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_BLEND);
 	// Shader program
 	Shader shader("shader.vert", "shader.frag");
 	Shader lightSourceShader("lightsource.vert", "lightsource.frag");
@@ -172,9 +173,9 @@ int main() {
 	//Model backpack = Model("model/backpack/backpack.obj");
 	//Model backpack = Model("model/anime2/anime.gltf");
 
-	unsigned int cubeTexture = loadTexture("resources/textures/marble.jpg");
-	unsigned int floorTexture = loadTexture("resources/textures/metal.png");
-	unsigned int grassTexture = loadTexture("resources/textures/grass.png");
+	unsigned int cubeTexture = loadTexture("resources/textures/marble.jpg", false);
+	unsigned int floorTexture = loadTexture("resources/textures/metal.png", false);
+	unsigned int grassTexture = loadTexture("resources/textures/grass.png", true);
 
 
 	shader.use();
@@ -319,15 +320,21 @@ void scroll_callback(GLFWwindow* window, double xoffset, double yoffset) {
 	camera.processMouseScroll((float)yoffset);
 }
 
-unsigned int loadTexture(const char* filePath) {
+unsigned int loadTexture(const char* filePath, bool isClamped) {
 	int width, height, nrChannels;
 	unsigned int textureID;
 	glGenTextures(1, &textureID);
 	glBindTexture(GL_TEXTURE_2D, textureID);
 
 	// set the texture wrapping/filtering options (on the currently bound texture object)
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	if (isClamped) {
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	}
+	else {
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	}
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
