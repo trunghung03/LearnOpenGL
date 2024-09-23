@@ -47,6 +47,7 @@
     <None Include="shader.frag" />
     <None Include="lightsource.frag" />
     <None Include="lightsource.vert" />
+    <None Include="shaderSingleColor.frag" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="container.jpg">

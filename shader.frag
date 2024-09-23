@@ -55,6 +55,8 @@ in vec3 FragPos;
 in vec3 Position;
 
 in vec2 TexCoords;
+uniform sampler2D texture1;
+
 
 uniform float time;
 uniform int screenWidth;
@@ -79,6 +81,7 @@ float LinearizeDepth(float depth)
 
 void main()
 {
+/*
     // properties
     vec3 norm = normalize(Normal);
     vec3 viewDir = normalize(viewPos - FragPos);
@@ -95,6 +98,13 @@ void main()
     //float depth = LinearizeDepth(gl_FragCoord.z) / far * 30; // divide by far for demonstration
     //FragColor = vec4(vec3(depth), 1.0);
     //FragColor = mix(texture(texture1, TexCoord), texture(texture2, TexCoord), 0.2f);
+    */
+    vec4 texColor = texture(texture1, TexCoords);
+    if (texColor.a < 0.1)
+        discard;
+
+    FragColor = texture(texture1, TexCoords);
+
 }
 
 vec3 CalcDirLight(DirLight light, vec3 normal, vec3 viewDir)

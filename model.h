@@ -159,7 +159,7 @@ unsigned int TextureFromFile(const char* filePath, const std::string &directory)
 	stbi_set_flip_vertically_on_load(true);
 	unsigned char* data = stbi_load(filename.c_str(), &width, &height, &nrChannels, 0);
 	if (data) {
-		GLenum format;
+		GLenum format = GL_RGB;
 		switch (nrChannels) {
 		case 1:
 			format = GL_RED;
@@ -169,6 +169,9 @@ unsigned int TextureFromFile(const char* filePath, const std::string &directory)
 			break;
 		case 4:
 			format = GL_RGBA;
+			break;
+		default:
+			format = GL_RGB; // fallback
 			break;
 		}
 

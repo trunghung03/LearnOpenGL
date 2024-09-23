@@ -35,7 +35,7 @@ public:
 		Pitch = 0.0f;
 
 		Zoom = 45.0f;
-		MovementSpeed = 2.0f;
+		MovementSpeed = 1.0f;
 		Sensitivity = 0.1f;
 
 		updateCameraVector();
