@@ -2,12 +2,14 @@
 #include <array>
 #include <math.h>
 #include <filesystem>
+#include <map>
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <glm.hpp>
 #include <gtc/matrix_transform.hpp>
 #include <gtc/type_ptr.hpp>
+#include <gtx/norm.hpp>
 
 #include "shader.h"
 #include "camera.h"
@@ -46,6 +48,7 @@ int main() {
 	glfwSetScrollCallback(window, scroll_callback);
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	// Shader program
 	Shader shader("shader.vert", "shader.frag");
 	Shader lightSourceShader("lightsource.vert", "lightsource.frag");
@@ -115,7 +118,7 @@ int main() {
 		 5.0f, -0.5f, -5.0f,  2.0f, 2.0f
 	};
 
-	float vegetationVertices[] = {
+	float windowVertices[] = {
 		// positions         // texture Coords (swapped y coordinates because texture is flipped upside down)
 		0.0f,  0.5f,  0.0f,  0.0f,  0.0f,
 		0.0f, -0.5f,  0.0f,  0.0f,  1.0f,
@@ -126,12 +129,12 @@ int main() {
 		1.0f,  0.5f,  0.0f,  1.0f,  0.0f
 	};
 
-	std::vector<glm::vec3> vegetation;
-	vegetation.push_back(glm::vec3(-1.5f, 0.0f, -0.48f));
-	vegetation.push_back(glm::vec3(1.5f, 0.0f, 0.51f));
-	vegetation.push_back(glm::vec3(0.0f, 0.0f, 0.7f));
-	vegetation.push_back(glm::vec3(-0.3f, 0.0f, -2.3f));
-	vegetation.push_back(glm::vec3(0.5f, 0.0f, -0.6f));
+	std::vector<glm::vec3> windows;
+	windows.push_back(glm::vec3(-1.5f, 0.0f, -0.48f));
+	windows.push_back(glm::vec3(1.5f, 0.0f, 0.51f));
+	windows.push_back(glm::vec3(0.0f, 0.0f, 0.7f));
+	windows.push_back(glm::vec3(-0.3f, 0.0f, -2.3f));
+	windows.push_back(glm::vec3(0.5f, 0.0f, -0.6f));
 
 	// cube VAO
 	unsigned int cubeVAO, cubeVBO;
@@ -158,12 +161,12 @@ int main() {
 	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
 	glBindVertexArray(0);
 	// tranparent VAO
-	unsigned int vegetationVAO, vegetationVBO;
-	glGenVertexArrays(1, &vegetationVAO);
-	glGenBuffers(1, &vegetationVBO);
-	glBindVertexArray(vegetationVAO);
-	glBindBuffer(GL_ARRAY_BUFFER, vegetationVBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vegetationVertices), &vegetationVertices, GL_STATIC_DRAW);
+	unsigned int windowVAO, windowVBO;
+	glGenVertexArrays(1, &windowVAO);
+	glGenBuffers(1, &windowVBO);
+	glBindVertexArray(windowVAO);
+	glBindBuffer(GL_ARRAY_BUFFER, windowVBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(windowVertices), &windowVertices, GL_STATIC_DRAW);
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(1);
@@ -175,7 +178,7 @@ int main() {
 
 	unsigned int cubeTexture = loadTexture("resources/textures/marble.jpg", false);
 	unsigned int floorTexture = loadTexture("resources/textures/metal.png", false);
-	unsigned int grassTexture = loadTexture("resources/textures/grass.png", true);
+	unsigned int windowTexture = loadTexture("resources/textures/window.png", true);
 
 
 	shader.use();
@@ -224,14 +227,24 @@ int main() {
 		glDrawArrays(GL_TRIANGLES, 0, 6);
 		glBindVertexArray(0);
 
-		// Grass
-		glBindVertexArray(vegetationVAO);
+		// Glass
+		glBindVertexArray(windowVAO);
 		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, grassTexture);
+		glBindTexture(GL_TEXTURE_2D, windowTexture);
 
-		for (unsigned int i = 0; i < vegetation.size(); i++) {
+		std::map<float, glm::vec3> sortedGlasses;
+		for (unsigned int i = 0; i < windows.size(); i++) {
+			float distance = glm::length2(camera.Position - windows[i]);
+			sortedGlasses[distance] = windows[i];
+		}
+
+		for (std::map<float, glm::vec3>::reverse_iterator it = sortedGlasses.rbegin(); it != sortedGlasses.rend(); ++it) {
+
+		}
+
+		for (unsigned int i = 0; i < windows.size(); i++) {
 			model = glm::mat4(1.0f);
-			model = glm::translate(model, vegetation[i]);
+			model = glm::translate(model, windows[i]);
 			shader.setMat4("model", model);
 			glDrawArrays(GL_TRIANGLES, 0, 6);
 		}
