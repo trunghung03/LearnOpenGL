@@ -71,6 +71,9 @@ vec3 CalcSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir);
 
 float near = 0.1; 
 float far  = 100.0; 
+
+uniform vec3 cameraPos;
+uniform samplerCube skybox;
   
 float LinearizeDepth(float depth) 
 {
@@ -99,7 +102,11 @@ void main()
     //FragColor = vec4(vec3(depth), 1.0);
     //FragColor = mix(texture(texture1, TexCoord), texture(texture2, TexCoord), 0.2f);
     */
-    FragColor = texture(texture1, TexCoords);
+
+    vec3 I = normalize(Position - cameraPos);
+    vec3 R = reflect(I, normalize(Normal));
+
+    FragColor = vec4(texture(skybox, R).rgb, 1.0);
 
 }
 

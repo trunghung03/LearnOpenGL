@@ -50,6 +50,8 @@
     <None Include="shaderSingleColor.frag" />
     <None Include="display.vert" />
     <None Include="display.frag" />
+    <None Include="skybox.frag" />
+    <None Include="skybox.vert" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="container.jpg">
