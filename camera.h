@@ -75,6 +75,10 @@ public:
 		return glm::lookAt(Position, Position + Front, Up);
 	}
 
+	glm::mat4 getBackwardViewMatrix() const {
+		return glm::lookAt(Position, Position - Front, Up);
+	}
+
 	void processKeyboard(Camera_Movement movement, float deltaTime) {
 		glm::vec3 planeFront = glm::normalize(glm::vec3(Front.x, 0, Front.z));
 		switch (movement) {

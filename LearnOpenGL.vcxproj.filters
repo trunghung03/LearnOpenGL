@@ -48,6 +48,8 @@
     <None Include="lightsource.frag" />
     <None Include="lightsource.vert" />
     <None Include="shaderSingleColor.frag" />
+    <None Include="display.vert" />
+    <None Include="display.frag" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="container.jpg">
