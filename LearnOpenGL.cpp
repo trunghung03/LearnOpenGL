@@ -283,43 +283,15 @@ int main() {
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glEnable(GL_DEPTH_TEST);
 
-		{
-			shader.use();
-			glm::mat4 model = glm::mat4(1.0f);
-			glm::mat4 view = camera.getViewMatrix();
-			glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCREEN_WIDTH / SCREEN_HEIGHT, 0.1f, 100.0f);
-			shader.setMat4("view", view);
-			shader.setMat4("projection", projection);
+		
+		shader.use();
+		glm::mat4 model = glm::mat4(1.0f);
+		glm::mat4 view = camera.getViewMatrix();
+		glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCREEN_WIDTH / SCREEN_HEIGHT, 0.1f, 100.0f);
+		shader.setMat4("view", view);
+		shader.setMat4("projection", projection);
 
-			// Cubes 
-			glBindVertexArray(cubeVAO);
-			glActiveTexture(GL_TEXTURE0);
-			glBindTexture(GL_TEXTURE_2D, cubeTexture);
-			model = glm::translate(model, glm::vec3(-1.0f, 0.0f, -1.0f));
-			shader.setMat4("model", model);
-			glDrawArrays(GL_TRIANGLES, 0, 36);
-			model = glm::mat4(1.0f);
-			model = glm::translate(model, glm::vec3(2.0f, 0.0f, 0.0f));
-			shader.setMat4("model", model);
-			glDrawArrays(GL_TRIANGLES, 0, 36);
-
-			// Floor
-			glBindVertexArray(planeVAO);
-			glActiveTexture(GL_TEXTURE0);
-			glBindTexture(GL_TEXTURE_2D, floorTexture);
-			shader.setMat4("model", glm::mat4(1.0f));
-			glDrawArrays(GL_TRIANGLES, 0, 6);
-			glBindVertexArray(0);
-		}
-
-		glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-		displayShader.use();
-		glBindVertexArray(displayVAO);
-		glDisable(GL_DEPTH_TEST);
-		glBindTexture(GL_TEXTURE_2D, textureColorbuffer);
-		glDrawArrays(GL_TRIANGLES, 0, 6);
-
+		
 
 
 
@@ -359,12 +331,24 @@ int main() {
 
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-		displayShader.use();
-		glBindVertexArray(display2VAO);
-		glDisable(GL_DEPTH_TEST);
+		shader.use();
+		glBindVertexArray(planeVAO);
+		//glDisable(GL_DEPTH_TEST);
+		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, textureColorbuffer);
+		shader.setMat4("model", glm::mat4(1.0f));
 		glDrawArrays(GL_TRIANGLES, 0, 6);
 
+		glBindVertexArray(cubeVAO);
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, textureColorbuffer);
+		model = glm::translate(model, glm::vec3(-1.0f, 0.0f, -1.0f));
+		shader.setMat4("model", model);
+		glDrawArrays(GL_TRIANGLES, 0, 36);
+		model = glm::mat4(1.0f);
+		model = glm::translate(model, glm::vec3(2.0f, 0.0f, 0.0f));
+		shader.setMat4("model", model);
+		glDrawArrays(GL_TRIANGLES, 0, 36);
 
 		// swap buffer and call events
 		glfwPollEvents();
