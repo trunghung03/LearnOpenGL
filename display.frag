@@ -23,9 +23,9 @@ void main()
     );
 
     float kernel[9] = float[](
-        0, -1, 0,
-        -1, 5, -1,
-        0, -1, 0
+       3, 3, 3,
+        3, -23, 3,
+        3, 3, 3
     );
 
     
@@ -39,5 +39,8 @@ void main()
         col += sampleTex[i] * kernel[i];
     
     FragColor = vec4(col, 1.0);
+
+    float average = 0.2126 * FragColor.r + 0.7152 * FragColor.g + 0.0722 * FragColor.b;
+    FragColor = vec4(average, average, average, 1.0);
 
 }  
